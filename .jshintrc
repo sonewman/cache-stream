@@ -1,0 +1,6 @@
+{
+  "laxcomma": true,
+  "laxbreak": true,
+  "boss": true,
+  "expr": true
+}
