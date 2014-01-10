@@ -6,6 +6,16 @@
   "scripts": {
     "test": "./test/test.js"
   },
-  "author": "",
-  "license": "ISC"
+  "author": "Sam Newman",
+  "license": "BSD",
+  "devDependencies": {
+    "tap": "~0.4.7"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/isaacs/node-tap.git"
+  },
+  "dependencies": {
+    "inherits": "~2.0.1"
+  }
 }
