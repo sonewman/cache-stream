@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/isaacs/node-tap.git"
+    "url": "git@github.com:sonewman/cache-stream.git"
   },
   "dependencies": {
     "inherits": "~2.0.1"
