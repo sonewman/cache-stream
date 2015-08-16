@@ -1,8 +1,8 @@
 module.exports = Cache;
 
-var fs = require('fs')
-  , PassThrough = require('stream').PassThrough
-  , inherits = require('inherits');
+var fs = require('fs');
+var PassThrough = require('stream').PassThrough;
+var inherits = require('inherits');
 
 /**
  * main module.exports
@@ -38,9 +38,8 @@ function Cache (opts) {
 
 inherits(Cache, PassThrough);
 
-
 //  set original write method to local
-var write = Cache.prototype.write;
+Cache.prototype.write_ = Cache.prototype.write;
 //  monkey patch write method
 Cache.prototype.write = function (data, enc, cb) {
   //  push data into cache
@@ -48,7 +47,7 @@ Cache.prototype.write = function (data, enc, cb) {
   //  this would work for old streams but not new
   //  as buffer would not be created......... hmmm
   this._cache.push(data);
-  write.call(this, data, enc, cb);
+  return this.write_(data, enc, cb);
 };
 
 //  set original pipe method to local
@@ -79,23 +78,32 @@ Cache.prototype.pipe = function (dest, opts) {
  * @param  {Stream} dest
  */
 function flush (stream, dest, sync) {
-  var cache = stream._cache
-    , l = cache.length;
+  var cache = stream._cache;
+  var last = cache.length - 1;
   //  if options sync has been specified then
   //  loop cache and write to dest
-  cache.forEach(function (data, i) {
+  cache.forEach(function (data, index) {
 
     sync
-      ? pump(dest, data, i, l-1)
+      ? pump(dest, data, index, last)
     //  the async way!
-      : process.nextTick(pump.bind(null, dest, data, i, l-1));
+      : process.nextTick(function () {
+          pump(dest, data, index, last);
+        });
   });
 }
 
-function pump (dest, data, i, l) {
+function isStd (dest) {
+  return dest === process.stdout || dest === process.stderr;
+}
+
+function pump (dest, data, index, last) {
   //  call write or end depending on if 
   //  the data is on it's last chunk
-  dest[(i !== l) ? 'write' : 'end'](data);
+  if ((index !== last) || isStd(dest))
+    dest.write(data);
+  else
+    dest.end(data);
 }
 
 //  add readStream method, which creates a

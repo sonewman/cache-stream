@@ -32,5 +32,4 @@ test('test stream caches data', function (t) {
   fs.createReadStream(path.join(__dirname, './data.txt')).pipe(c);
 
   c.pipe(w);
-
 });
